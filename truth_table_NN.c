@@ -2,13 +2,15 @@
 #include <stdlib.h>
 #include <math.h>
 
+// EXPAND TO HIGHER TRAINING SETS AND INPUTS
+
 // --- Simple Neural Network that learns boolean functions from a Truth Table ---
-#define NUM_INPUT_NEURONS 2
-#define NUM_HIDDEN_NEURONS 2
-#define NUM_OUTPUT_NEURONS 1
-#define NUM_TRAINING_SETS 4
+#define NUM_INPUT_NEURONS 4
+#define NUM_HIDDEN_NEURONS 10
+#define NUM_OUTPUT_NEURONS 7
+#define NUM_TRAINING_SETS 10
 #define NUM_EPOCHS 10000
-#define LEARNING_RATE 0.1f
+#define LEARNING_RATE 0.2f
 
 // --- Function Definitions ---
 
@@ -73,25 +75,67 @@ float NN_predict(double *inputs, double *output_layer, double *hidden_layer, dou
     }
 
     // Print Network Results
+    printf("Input : ");
+    for (int i = 0; i < NUM_INPUT_NEURONS; i++)
+    {
+        printf(" %d", (int)inputs[i]);
+    }
+    printf("       NN Output : ");
     for (int i = 0; i < NUM_OUTPUT_NEURONS; i++)
     {
-        printf("Input : ");
-        for (int i = 0; i < NUM_INPUT_NEURONS; i++)
-        {
-            printf(" %d", (int)inputs[i]);
-        }
-        printf("       NN Output : ");
-        for (int i = 0; i < NUM_OUTPUT_NEURONS; i++)
-        {
-            printf(" %f", output_layer[i]);
-        }
-        printf("       Thresholded Output : ");
-        for (int i = 0; i < NUM_OUTPUT_NEURONS; i++)
-        {
-            printf(" %d", (int)round(output_layer[i]));
-        }
-        printf("\n");
+        printf(" %f", output_layer[i]);
     }
+    printf("       Thresholded Output : ");
+    for (int i = 0; i < NUM_OUTPUT_NEURONS; i++)
+    {
+        printf(" %d", (int)round(output_layer[i]));
+    }
+    printf("\n");
+}
+
+// print_list : Prints an array in python list format
+void print_list(double *list, int length)
+{
+    printf("[ ");
+    for (int i = 0; i < length; i++)
+    {
+        printf((i < length - 1) ? "%f, " : "%f", list[i]);
+    }
+    printf(" ]\n");
+}
+
+// NN_Specs : Displays network specs
+void NN_Specs(double *hidden_layer_bias, double *output_layer_bias, double hidden_layer_weights[NUM_INPUT_NEURONS][NUM_HIDDEN_NEURONS], double output_layer_weights[NUM_HIDDEN_NEURONS][NUM_OUTPUT_NEURONS])
+{
+    // --- Output Specs ---
+    printf("\n--- Network Structure ---\n\n");
+    printf("Input Neurons : %d\n", NUM_INPUT_NEURONS);
+    printf("Hidden Layer Neurons : %d\n", NUM_HIDDEN_NEURONS);
+    printf("Output Layer Neurons : %d\n", NUM_OUTPUT_NEURONS);
+    printf("Epochs : %d\n", NUM_EPOCHS);
+    printf("Number of Training Sets : %d\n", NUM_TRAINING_SETS);
+
+    // --- Output Weights and Biases ---
+    printf("\n--- Network Weights and Biases ---\n\n");
+    printf("Hidden Layer Bias : \n");
+    print_list(hidden_layer_bias, NUM_HIDDEN_NEURONS);
+    printf("\nOutput Layer Bias : \n");
+    print_list(output_layer_bias, NUM_OUTPUT_NEURONS);
+
+    printf("\nHidden Layer Weights : \n");
+    for (int i = 0; i < NUM_INPUT_NEURONS; i++)
+    {
+        printf("Hidden Neuron %d : ", i);
+        print_list(hidden_layer_weights[i], NUM_HIDDEN_NEURONS);
+    }
+
+    printf("\nOutput Layer Weights : \n");
+    for (int i = 0; i < NUM_HIDDEN_NEURONS; i++)
+    {
+        printf("Output Neuron %d : ", i);
+        print_list(output_layer_weights[i], NUM_OUTPUT_NEURONS);
+    }
+    printf("\n\n");
 }
 
 int main()
@@ -109,9 +153,28 @@ int main()
     double hidden_layer_weights[NUM_INPUT_NEURONS][NUM_HIDDEN_NEURONS];
     double output_layer_weights[NUM_HIDDEN_NEURONS][NUM_OUTPUT_NEURONS];
 
-    // --- Setup Training Data ---
-    double training_inputs[NUM_TRAINING_SETS][NUM_INPUT_NEURONS] = {{0.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}};
-    double training_outputs[NUM_TRAINING_SETS][NUM_OUTPUT_NEURONS] = {{0.0f}, {1.0f}, {1.0f}, {1.0f}};
+    // --- Setup Training Data (Seven-Segment Display) ---
+    double training_inputs[NUM_TRAINING_SETS][NUM_INPUT_NEURONS] = {
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 1.0f, 0.0f},
+        {0.0f, 0.0f, 1.0f, 1.0f},
+        {0.0f, 1.0f, 0.0f, 0.0f},
+        {0.0f, 1.0f, 0.0f, 1.0f},
+        {0.0f, 1.0f, 1.0f, 0.0f},
+        {0.0f, 1.0f, 1.0f, 1.0f},
+        {1.0f, 0.0f, 0.0f, 0.0f},
+        {1.0f, 0.0f, 0.0f, 1.0f}};
+    double training_outputs[NUM_TRAINING_SETS][NUM_OUTPUT_NEURONS] = {{1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f},
+                                                                      {0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+                                                                      {1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f},
+                                                                      {1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f},
+                                                                      {0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f},
+                                                                      {1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f},
+                                                                      {1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
+                                                                      {1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+                                                                      {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
+                                                                      {1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f}};
 
     // --- Initialise Weights and Biases ---
     for (int i = 0; i < NUM_INPUT_NEURONS; i++)
@@ -135,17 +198,25 @@ int main()
         output_layer_bias[i] = init_weights();
     }
 
-    // Run Network on Initial Weights and Biases
     printf("\n--- NN Before Training ---\n");
+    NN_Specs(hidden_layer_bias, output_layer_bias, hidden_layer_weights, output_layer_weights);
+    printf("Pre-Training Output : \n\n");
+
+    // Run Network Before Training
     for (int i = 0; i < NUM_TRAINING_SETS; i++)
     {
         NN_predict(training_inputs[i], output_layer, hidden_layer, hidden_layer_bias, output_layer_bias, hidden_layer_weights, output_layer_weights);
     }
 
     // Train Network
-    printf("\n\nTraining Network...\n\n");
+    printf("\nTraining Network...\n\n");
+
     // --- Initialise Training Set Order ---
-    int training_set_order[] = {0, 1, 2, 3};
+    int training_set_order[NUM_TRAINING_SETS];
+    for (int i = 0; i < NUM_TRAINING_SETS; i++)
+    {
+        training_set_order[i] = i;
+    }
 
     // --- Training Loop ---
     int epoch = 0;
@@ -233,8 +304,9 @@ int main()
         epoch++;
     }
 
+    NN_Specs(hidden_layer_bias, output_layer_bias, hidden_layer_weights, output_layer_weights);
+    printf("Post Training Output : \n\n");
     // Run Network Prior to Training
-    printf("\n--- NN After Training ---\n");
     for (int i = 0; i < NUM_TRAINING_SETS; i++)
     {
         NN_predict(training_inputs[i], output_layer, hidden_layer, hidden_layer_bias, output_layer_bias, hidden_layer_weights, output_layer_weights);
